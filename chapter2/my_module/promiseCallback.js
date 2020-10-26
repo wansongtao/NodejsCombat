@@ -45,7 +45,7 @@ http.createServer(async (req, res) => {
  * @returns 返回一个期约，期约变为解决状态后返回文件内容（字符串格式）
  */
 function readFile(url) {
-    if (!(typeof url === 'string')) {
+    if (typeof url !== 'string') {
         throw new TypeError('readFile(): arguments type error.');
     }
 
@@ -54,17 +54,14 @@ function readFile(url) {
 
         fs.readFile(filePath, (err, data) => {
             if (err) {
-                throw err;
+                //拒接状态报错
+                reject((err) => {
+                    throw new Error('readFile(): Promise => reject' + err);
+                });
             }
 
             //期约从待定状态变为解决状态后，返回一个值
             resolve(data.toString());
-
-            //拒接状态报错
-            reject(() => {
-                throw new Error('readFile(): Promise => reject');
-            });
-
         });
     });
 }

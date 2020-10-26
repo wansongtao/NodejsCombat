@@ -3,9 +3,12 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 
-http.createServer(async (req, res) => {
+/**
+ * 创建HTTP服务器并用回调定义响应逻辑
+ */
+http.createServer((req, res) => {
     if (req.url === '/') {
-       let data =  await getTitle(res);
+       getTitle(res);
     } else {
         res.end('404');
     }
@@ -21,27 +24,21 @@ http.createServer(async (req, res) => {
  * @param {Object} res 响应对象
  */
 function getTitle(res) {
-    return new Promise((resolve, reject) => {
-        if(!(res instanceof Object)) {
-            throw new TypeError('arguments type error');
+    if(!(res instanceof Object)) {
+        throw new TypeError('getTitle(): arguments type error');
+    }
+
+    const filePath = path.join(__dirname, 'source/title.json');
+    fs.readFile(filePath, (err, data) => {
+        if(err) {
+            //返回错误
+            throw err;
         }
-    
-        const filePath = path.join(__dirname, 'source/title.json');
-        fs.readFile(filePath, (err, data) => {
-            if(err) {
-                //返回错误
-                reject(err);
-            }
-    
-            //返回数据
-            resolve(data);
-    
-            const titles = JSON.parse(data.toString()).title;
-    
-            getTemplate(res, titles);
-        });
+
+        const titles = JSON.parse(data.toString()).title;
+
+        getTemplate(res, titles);
     });
-    
 }
 
 /**
@@ -51,7 +48,11 @@ function getTitle(res) {
  */
 function getTemplate(res, titles) {
     if(!(res instanceof Object)) {
-        throw new TypeError('arguments type error');
+        throw new TypeError('getTemplate(): arguments type error');
+    }
+
+    if(typeof titles !== 'string') {
+        throw new TypeError('getTemplate(): arguments type error');
     }
 
     const filePath = path.join(__dirname, 'source/template.html');

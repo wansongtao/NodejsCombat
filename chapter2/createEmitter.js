@@ -1,5 +1,3 @@
-const { EventEmitter } = require('events');
-
 //创建事件发射器
 const EventEmitters = require('events').EventEmitter;
 const channel = new EventEmitters();
